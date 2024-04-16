@@ -39,7 +39,7 @@ class Program
         //{
         //    fileName = @"ClientDatabase_" + clientName + ".xml";
         //}
-        string fileNameAndPath = Settings.Env.InputFolder + fileName;
+        string fileNameAndPath = new Routines.Config().ReadValue("WorkingFolder") + fileName;
 
 
         // ignore getting from S3 for the moment some security setting not sure i should tamper with
@@ -182,7 +182,7 @@ where id = @Id
 
 
         // Use SqlConnection to connect to the database
-        using (SqlConnection connection = new SqlConnection(Settings.Env.AWSConnectionString))
+        using (SqlConnection connection = new SqlConnection(new Routines.Config().ReadValue("AWSConnectionString")))
         {
             // Use SqlCommand to execute the query
             using (SqlCommand command = new SqlCommand(query, connection))

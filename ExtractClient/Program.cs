@@ -14,7 +14,7 @@ using Amazon.S3.Transfer;
 class Program
 {
     string clientName = "";
-    
+
     static void Main(string[] args)
     {
         string clientName = "";
@@ -23,8 +23,8 @@ class Program
         {
             clientName = args[0];
         }
-         
-    
+
+
         // SQL query to look up clientName in a table
         //string query = "SELECT * FROM Clientdatabase WHERE Name = @ClientName";
         string query = @" 
@@ -55,7 +55,7 @@ SELECT (
 
 ";
         // Use SqlConnection to connect to the database
-        using (SqlConnection connection = new SqlConnection(Settings.Env.RackSpaceConnectionString))
+        using (SqlConnection connection = new SqlConnection(new Routines.Config().ReadValue("RackSpaceConnectionString")))
         {
             // Use SqlCommand to execute the query
             using (SqlCommand command = new SqlCommand(query, connection))
@@ -86,14 +86,16 @@ SELECT (
                                 outputFileName = @"ClientDatabase_" + clientName + ".xml";
                             }
 
-                            if (System.IO.File.Exists(Settings.Env.OutputFolder + outputFileName))
+                            string workingfolder = new Routines.Config().ReadValue("WorkingFolder");
+
+                            if (System.IO.File.Exists(workingfolder + outputFileName))
                             {
-                                File.Delete(Settings.Env.OutputFolder + outputFileName);
+                                File.Delete(workingfolder + outputFileName);
                             }
 
-                            File.WriteAllText(Settings.Env.OutputFolder + outputFileName, xmlData);
+                            File.WriteAllText(workingfolder + outputFileName, xmlData);
 
-                            Console.WriteLine(Settings.Env.OutputFolder + outputFileName + " Created");
+                            Console.WriteLine(workingfolder + outputFileName + " Created");
 
 
                             Amazon.S3.AmazonS3Client s3Client = new Amazon.S3.AmazonS3Client("AKIAS7VDU44CT5BVUCKW", new Routines.Decrypt().Exec("h7mDbcMs+zyfrKifN7xB9L5eIQ08dPQFs0e01ah+RxPG2StJBIWg9PVKN2TtKX+M")
@@ -104,9 +106,9 @@ SELECT (
                                 TransferUtility transferUtility = new TransferUtility(s3Client);
 
                                 TransferUtilityUploadRequest request = new TransferUtilityUploadRequest();
-                                
+
                                 request.BucketName = "earcu-install-files";
-                                request.FilePath = Settings.Env.OutputFolder +  outputFileName;
+                                request.FilePath = new Routines.Config().ReadValue("WorkingFolder") + outputFileName;
                                 request.Key = "data-migration-files/" + outputFileName;
                                 request.ContentType = "text/xml";
                                 request.CannedACL = S3CannedACL.BucketOwnerFullControl;
@@ -123,7 +125,7 @@ SELECT (
                             }
 
                         }
-                        
+
                         if (recordCount == 0)
                         {
                             Console.WriteLine("No client found using name=" + clientName);
@@ -146,7 +148,7 @@ SELECT (
         Console.ReadLine();
     }
 
-     
+
 
 
 

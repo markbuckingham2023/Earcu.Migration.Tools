@@ -11,7 +11,7 @@ namespace Routines
             {
                 byte[] salt = Encoding.UTF8.GetBytes("saltydogcrispsourlovely");
 
-                var key = new Rfc2898DeriveBytes(Settings.Env.Secret, salt);
+                var key = new Rfc2898DeriveBytes(new Routines.Config().ReadValue("Secret"), salt);
                 rijAlg.Key = key.GetBytes(rijAlg.KeySize / 8);
                 rijAlg.IV = key.GetBytes(rijAlg.BlockSize / 8);
 
