@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "ImportClient": {
+      "commandName": "Project",
+      "commandLineArgs": "Demo1"
+    }
+  }
+}
